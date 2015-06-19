@@ -21,13 +21,22 @@ def make_function(N=10, dp=0.1, sd_scale=5, domain=100):
 
     def f_(x):
         assert not isinstance(x, collections.Iterable) # NOT arrays
+        if x < 0 or x > 100:
+            return 0
         return numpy.sum(w * norm.pdf((x-mu)/sd))
 
-    # Find the true normalizing constant
-    Z, err = integrate(f_, 0, domain)
+    def cdf_(x):
+        if x < 0:
+            return 0
+        if x > 100:
+            x = 100
+        return numpy.sum(w * norm.cdf((x-mu)/sd)) - numpy.sum(w * norm.cdf((0-mu)/sd))
 
-    # the normalized version
-    return lambda x: f_(x) / Z
+    # Find the true normalizing constant
+    normalizingConastant = numpy.sum(w * norm.cdf((100-mu)/sd)) - numpy.sum(w * norm.cdf((0-mu)/sd))
+
+    # Return a function and a cdf
+    return lambda x: f_(x) / normalizingConastant, lambda x: cdf_(x) / normalizingConastant
 
 
 if __name__ == "__main__":

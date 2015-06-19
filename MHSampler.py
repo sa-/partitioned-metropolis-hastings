@@ -4,7 +4,6 @@ from random import uniform
 
 """
     TODO:
-    - Don't need cdf parameters anymore because of scipy.integrate.quad()
     - 'Absolute Difference' calculations need some cleaning up.
 """
 
@@ -121,7 +120,7 @@ def partitionedSampler(f, cdf, partitions, binCount=210, stepSize=1., numberOfIt
     # Compute the true CDF of curve
     trueCDF = []
     for e in edges[1:]:
-        val, err = cdf(e)
+        val = cdf(e)
         trueCDF.append(val)
     # print "trueCDF[-1]:"
     # print trueCDF[-1]
@@ -179,7 +178,7 @@ def classicSampler(f, cdf, binCount=210, stepSize=1., numberOfIterations=20000, 
     # Compute the true CDF of curve
     trueCDF = []
     for e in edges[1:]:
-        val, err = cdf(e)
+        val = cdf(e)
         trueCDF.append(val)
 
     # The difference in the CDFs at every right edge of the histogram bins
