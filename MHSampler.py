@@ -22,7 +22,7 @@ def getAbsoluteDifference(f, cdf, partitions=None, binCount=210, stepSize=1., nu
 def partitionedSampler(f, cdf, partitions, binCount=210, stepSize=1., numberOfIterations=20000, plot=False, verbose=False):
 
     """
-        TODO: Try making the stepSize a function of the size of the partition
+        TODO: See if making the stepSize a function of the size of the partition makes things better?
     """
 
     numberOfIterations = numberOfIterations/(len(partitions))

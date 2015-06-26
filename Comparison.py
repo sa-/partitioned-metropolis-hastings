@@ -16,8 +16,8 @@ for i in range(1000):
 
         f, cdf   = make_function()
 
-        classic   = getAbsoluteDifference(f, cdf, numberOfIterations=steps, plot=True)
-        partition = getAbsoluteDifference(f, cdf, partitions=partitions, numberOfIterations=steps, plot=True)
+        classic   = getAbsoluteDifference(f, cdf, numberOfIterations=steps)
+        partition = getAbsoluteDifference(f, cdf, partitions=partitions, numberOfIterations=steps)
 
         print partitionCount, i, classic, "\t", partition
         sys.stdout.flush()
