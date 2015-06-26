@@ -17,15 +17,15 @@ class MHChain:
         self.partitions = partitions
 
         # Create an array to keep track of which partition we have proposed to
-        self.proposedToRegion = [0] * (len(partitions) + 1)  # [0,...,0]
+        self.proposedToRegion = [0] * (len(partitions) - 1)  # [0,...,0]
 
     def iterate(self):
 
         candidate = self.position + self.proposal[self.i]
         self.i = self.i+1
 
-        acceptanceProb = min([1.,
-            (self.f(candidate)/self.f(self.position))])
+        ratio = self.f(candidate)/self.f(self.position)
+        acceptanceProb = min([1., ratio])
 
         withinBounds = self.leftBound <= candidate and candidate <= self.rightBound
 
@@ -37,16 +37,14 @@ class MHChain:
         self.samples.append(self.position)
 
     def whichRegionWasProposedTo(self, proposal):
-        # Region 0 is (-inf,partition[0]].
-        # Region i is (partition[i+1], partition[i+2]]
-        # Region n+1 is (partition[-1],inf)
+        """
+        If [0, x1, x2, ..., 100] are the partitions,
+        partition[i],partition[i+1]] are the bounds of a region
 
+        TODO: make this O(log(n))
+        """
         # Find which region was propsoed to until the last region
-        for i in range(len(self.partitions))[1:]:
-            if(proposal < self.partitions[i]):
+        for i in range(len(self.partitions)-1):
+            if(proposal > self.partitions[i] and proposal < self.partitions[i+1]):
                 self.proposedToRegion[i] += 1
                 return
-
-        # If it is in the last region
-        if(proposal >= self.partitions[-1]):
-            self.proposedToRegion[len(self.partitions)] += 1

@@ -5,7 +5,7 @@
 import numpy
 import collections
 from scipy.stats import norm
-from scipy.integrate import quad as integrate
+
 
 def make_function(N=10, dp=0.1, sd_scale=5, domain=100):
     """
@@ -15,12 +15,12 @@ def make_function(N=10, dp=0.1, sd_scale=5, domain=100):
     sd_scale -- the scale of the exponential that we sample the sd from
     """
 
-    mu = numpy.random.random(N)*domain # the mean of each gaussian
+    mu = numpy.random.random(N)*domain  # the mean of each gaussian
     sd = numpy.random.exponential(sd_scale, size=N)
-    w  = numpy.random.dirichlet([dp]*N, size=N) # the weight assigned to each gaussian
+    w  = numpy.random.dirichlet([dp]*N, size=N)  # the weight assigned to each gaussian
 
     def f_(x):
-        assert not isinstance(x, collections.Iterable) # NOT arrays
+        assert not isinstance(x, collections.Iterable)  # NOT arrays
         if x < 0 or x > 100:
             return 0
         return numpy.sum(w * norm.pdf((x-mu)/sd))
@@ -48,5 +48,3 @@ if __name__ == "__main__":
 
     plt.plot(x, map(f,x), '-')
     plt.show()
-
-

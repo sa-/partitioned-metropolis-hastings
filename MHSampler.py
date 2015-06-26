@@ -21,32 +21,22 @@ def getAbsoluteDifference(f, cdf, partitions=None, binCount=210, stepSize=1., nu
 
 def partitionedSampler(f, cdf, partitions, binCount=210, stepSize=1., numberOfIterations=20000, plot=False, verbose=False):
 
-    numberOfIterations = numberOfIterations/(len(partitions)+1)
+    """
+        TODO: Try making the stepSize a function of the size of the partition
+    """
+
+    numberOfIterations = numberOfIterations/(len(partitions))
 
     # Create chains
     chains = []
 
-    # Create the chain that is to the left of the partitions
-    chain = MHChain(numberOfIterations, stepSize, partitions[0] - uniform(stepSize, 10*stepSize),
-                    float("-inf"),               # left bound
-                    partitions[0],               # right bound
-                    f, partitions)
-    chains.append(chain)
-
-    # Create chains that are in the middle of the partitions
-    for i in range(0, len(partitions)-1):
+    # Create sampler chains between partitions
+    for i in range(len(partitions)-1):
         lb = partitions[i]
         rb = partitions[i+1]
         pos = uniform(lb, rb)
         chain = MHChain(numberOfIterations, stepSize, pos, lb, rb, f, partitions)
         chains.append(chain)
-
-    # To the right
-    chain = MHChain(numberOfIterations, stepSize, partitions[-1] + uniform(stepSize, 10*stepSize),
-                    partitions[-1],             # left bound
-                    float("inf"),               # right bound
-                    f, partitions)
-    chains.append(chain)
 
     # Make them iterate one step at a time.
     for i in range(0, numberOfIterations):
@@ -99,7 +89,7 @@ def partitionedSampler(f, cdf, partitions, binCount=210, stepSize=1., numberOfIt
 
         # plt.subplot(2, 1, 2)
         plt.grid(True)
-        x = [float(i)/10 for i in range(-100, 100, 1)]
+        x = range(101)
         y = map(f, x)
         plt.hist(samples, weights=weights, bins=binCount, normed=1)
         plt.plot(x, y, 'r')
@@ -122,21 +112,17 @@ def partitionedSampler(f, cdf, partitions, binCount=210, stepSize=1., numberOfIt
     for e in edges[1:]:
         val = cdf(e)
         trueCDF.append(val)
-    # print "trueCDF[-1]:"
-    # print trueCDF[-1]
 
     # The difference in the CDFs at every right edge of the histogram bins
     differenceBetweenCDFs = []
     for i in range(len(trueCDF)):
         differenceBetweenCDFs.append(abs(trueCDF[i]-sampledCDF[i]))
 
-    # print "Mean differece:"
-    # print sum(differenceBetweenCDFs)/len(differenceBetweenCDFs)
     absoluteDifference = sum(differenceBetweenCDFs)
     return absoluteDifference
 
 
-def classicSampler(f, cdf, binCount=210, stepSize=1., numberOfIterations=20000, plot=False, verbose=False):
+def classicSampler(f, cdf, binCount=210, stepSize=5., numberOfIterations=20000, plot=False, verbose=False):
     a = 1.
     x = 0
 
@@ -158,7 +144,7 @@ def classicSampler(f, cdf, binCount=210, stepSize=1., numberOfIterations=20000, 
 
         plt.subplot(2, 1, 2)
         plt.grid(True)
-        x = [float(i)/10 for i in range(-100, 100, 1)]
+        x = range(101)
         y = map(f, x)
         plt.hist(samples, bins=binCount, normed=1)
         plt.plot(x, y, 'r')
@@ -188,5 +174,3 @@ def classicSampler(f, cdf, binCount=210, stepSize=1., numberOfIterations=20000, 
 
     absoluteDifference = sum(differenceBetweenCDFs)
     return absoluteDifference
-
-
